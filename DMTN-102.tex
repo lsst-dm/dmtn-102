@@ -1,0 +1,249 @@
+
+
+\documentclass[DM,authoryear,toc]{lsstdoc}
+% lsstdoc documentation: https://lsst-texmf.lsst.io/lsstdoc.html
+
+% Package imports go here.
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{latexsym}
+\usepackage{color}
+\usepackage{enumitem}
+
+% Local commands go here.
+
+% To add a short-form title:
+% \title[Short title]{Title}
+\title[Alerts Key Numbers]{LSST Alerts: Key Numbers}
+
+% Optional subtitle
+% \setDocSubtitle{A subtitle}
+
+\author{%
+M.~L.~Graham, E.~Bellm, L.~Guy, et al.
+}
+
+\setDocRef{DMTN-102}
+
+\date{\today}
+
+% Optional: name of the document's curator
+% \setDocCurator{The Curator of this Document}
+\setDocUpstreamLocation{\url{https://github.com/lsst-dm/dmtn-102}}
+
+\setDocAbstract{%
+Abstract text.
+}
+
+% Change history defined here.
+% Order: oldest first.
+% Fields: VERSION, DATE, DESCRIPTION, OWNER NAME.
+% See LPM-51 for version number policy.
+\setDocChangeRecord{%
+  \addtohist{1}{2018-12-06}{Unreleased.}{Melissa Graham}
+}
+
+\begin{document}
+
+% Create the title page.
+% Table of contents is added automatically with the "toc" class option.
+\maketitle
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\section{Introduction} \label{sec:intro}
+
+{\bf This document is currently in development and contains a lot of detailed information for the purposes of internal discussion; to be reduced/clarified later.} \textcolor{red}{Text in red needs some discussion by DM-SST.}
+
+The LSST Data Management System's (DMS) Alert Production (AP) pipeline will process new data as it is obtained by the telescope. Difference Imaging Analysis (DIA) will be performed, and all sources with a signal-to-noise ratio $>5$ in positive or negative flux will be considered ``detected", recorded in the source catalogs, and generate an alert. Each alert is a packet containing LSST data about the source such as coordinates, photometry, and image cutouts. For a full description of detected sources and alert packet contents, see \citeds{LSE-163}. The LSST alert stream will be delivered to several community-developed brokers, and also accessible to users via the LSST Science Platform's mini-broker; plans and policies for alert distribution are provided in \citeds{LDM-612}. 
+
+The purpose of this document is to quantitatively inform broker developers, and the broader scientific community planning to use alerts, on the key numbers regarding alert generation, distribution, and access via the LSST Mini-Broker. The goals of this document are threefold: (1) to provide all of the key numbers regarding alert generation in one place; (2) to include any and all basis information, assumptions, and derivations that contributed to the key number; and (3) to be clear about whether each key number represents an estimate, a requirement, or a boundary. 
+
+In this work we use 8 bits per byte ($\rm B$), and $1024$ $\rm B$ per $\rm KB$, $1024$ $\rm KB$ per $\rm MB$, and so forth.
+
+A list of resources being used in the preparation of this document.
+\begin{itemize}
+\item {\it LSST: From Science Drivers to Reference Design and Anticipated Data Products}, \citet{2008arXiv0805.2366I}
+\item LSST Science Requirements Document (SRD), \citeds{LPM-17}.
+\item LSST System Requirements (LSR), \citeds{LSE-29}.
+\item Observatory System Specifications (OSS) document, \citeds{LSE-30}.
+\item Data Management System Requirements (DMSR) document, \citeds{LSE-61}.
+\item Science Requirements and System Specifications Spreadsheet (SR\&SSS), \citeds{LSE-81}.
+\item Data Products Definitions Document (DPDD), \citeds{LSE-163}
+\item Plans and Policies for LSST Alert Distribution, \citeds{LDM-612}
+\item Data Management Science Pipelines Design, \citeds{LDM-151}
+\end{itemize}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\section{Alert Stream} \label{sec:alerts}
+
+The concept and existence of the LSST alert stream is baked into the highest-level document: the SRD specifies that information about the detections of transient, variable, and moving objects be released as a data stream within $1$ minute. 
+
+% % % % % % % % % % % % %
+\subsection{Alert Production Timescale}\label{ssec:OTT1}
+
+It is a formal requirement that the Data Management System distribute alerts to community brokers within $60$ seconds of the end of image readout.
+
+{\bf Formal Requirements --} Regarding the DMS's ability to generate alerts, the SRD states that {\it ``data on likely optical transients ... will be released with a latency of at most {\tt OTT1} minutes"}, where {\tt OTT1} is $1$/$2$/$0.5$ minutes (design/minimum specifications and stretch goal; \citeds{LPM-17}). The design specification value of {\tt OTT1} flows down to a formal requirement in the LSR that specifies {\it ``LSST shall meet the following specification for reporting of data on optical transients detected in single-visit data [in] {\tt OTT1}"}, and defines {\tt OTT1} as {\it ``the latency of reporting optical transients following the completion of readout of the last image of a visit"} (LSR-REQ-0101, \citeds{LSE-29}). The LSR also makes a formal requirement that the DMS's {\it ``algorithm shall be applied and the alert transmitted within the specified latency for at least a fraction {\tt OTR1} of instances ... [and] remaining transients ... be identified and recorded at the next processing opportunity"}, where {\tt OTR1} is $98\%$ (LSR-REQ-0025, \citeds{LSE-29}; see \S~\ref{ssec:OTR1}). The LSR requirement also flows down to more specific formal requirement in the OSS and DMSR, which both state that {\it ``Alerts shall be made available within time {\tt OTT1} from the conclusion of readout of the raw exposures used to generate each alert to the distribution of the alert to community distribution mechanisms"} (OSS-REQ-0127, \citeds{LSE-30}; DMS-REQ-0004, \citeds{LSE-61}). 
+
+\textcolor{red}{Tension in the Formal Requirements Definitions --} The SRD states that {\tt OTT1} is a requirement on the {\it releasing} of an alert; the LSR states that {\tt OTT1} is a requirement on the {\it reporting} of an alert (LSR-REQ-0101), and then later that it is the time for {\it transmitting} the alert to the broker (LSR-REQ-0025). It is only the OSS and DMSR that specifies that {\tt OTT1} ends at the time of distribution {\it to the broker}. Note that we often colloquially say {\it OTT1} starts {\it at the time of shutter close}, but it actually starts $2$ seconds later {\it at the end of readout} (or $>2$ seconds if slower reads are adopted). 
+
+\textcolor{red}{Requirement Breach Protocol --} For the {\tt OTR1} $=2\%$ of alerts allowed to be transmitted with $>$ {\tt OTT1} seconds, how will they be identified as delayed? I.e., with a flag in the alert packet?
+
+% {\bf Science Drivers --} \textcolor{red}{Address the main science driver(s) for {\tt OTT1} $=60$ seconds and how it was estimated.}
+
+
+% % % % % % % % % % % % %
+\subsection{Number of Alerts per Visit}\label{ssec:transN}
+
+It is a formal requirement that the Data Management System can sustain the generation of an average of at least $10000$ alerts per visit. 
+
+%%% Informed by Gregory's comments on the Confluence page
+%%% https://confluence.lsstcorp.org/pages/viewpage.action?pageId=94765182
+{\bf Formal Requirements --} Regarding the DMS's ability to generate alerts, the SRD states that {\it ``The system should be capable of reporting such data for at least {\tt transN} candidate transients per field of view and visit,"} where {\tt transN} is $10^4$/$10^3$/$10^5$ (design/minimum specifications and stretch goal; \citeds{LPM-17}). The design specification value of {\tt transN} flows down to a formal requirement in the LSR, which describes {\tt transN} as {\it ``the minimum number of optical transients for which data can be reported per visit"}, with a note that {\it ``it is unclear whether the SRD specification of {\tt transN} refers to the number of alerts that can be generated for a single visit (i.e. an instantaneous limit), or the number per visit averaged over time"} (LSR-REQ-0101, \citeds{LSE-29}). The OSS does clarify: {\it ``The LSST Data Management system shall be sized to accommodate an average value of at least {\tt nAlertVisitAvg} alerts generated per standard visit while meeting all its other requirements,"} where {\tt nAlertVisitAvg} is $10^4$ (OSS-REQ-0193 in \citeds{LSE-30}). No corresponding requirement is flowed down to the DMSR, but the SR\&SSS also uses the same minimum average value, and furthermore uses $40000$ as the {\it peak} number of alerts per visit, with a note that it was chosen as a number in between the SRD's minimum of $10^4$ and the stretch goal of $10^5$ \citedsp{LSE-81}. 
+
+\textcolor{red}{Tension in the Formal Requirements Definitions --} {\tt OTT1} appears in the DMSR, but neither {\tt transN} nor {\tt nAlertVisitAvg} do; is this a problem?
+
+\textcolor{red}{Requirement Breach Protocol --} Is there a new upper limit on the peak volume? In cases where there are $>40000$ alerts generated by a visit, does DM expect they issued with a delay?
+
+% {\bf Science Drivers --} \textcolor{red}{What and where is the background analysis that shows 10000 alerts per visit is not, from science perspective, too low? Check the Science Book.}
+
+
+% % % % % % % % % % % % %
+\subsection{Fraction of Visits with Delayed/Failed Alert Distribution}\label{ssec:sciVisitAlertFailure}
+
+It is a formal requirement that $<0.1\%$ of all science visits experience a total failure in alert generation and distribution. It is a formal requirement that $<1\%$ of all science visits have any fraction of their alerts experience a distribution delay $>60$ seconds.
+
+{\bf Formal Requirements --} The SRD and LSR do not say anything on this topic. The OSS specifies that {\it ``no more than {\tt sciVisitAlertFailure} \% of science visits ... shall fail to be subjected to alert generation and distribution"}, where {\tt sciVisitAlertFailure} $=0.1\%$, and that {\it ``no more than {\tt sciVisitAlertDelay} \% of science visits ... shall have their alert generation and distribution completed later than [{\tt OTT1}]"}, where {\tt sciVisitAlertDelay} $=1\%$ (OSS-REQ-0112; \citeds{LSE-30}). The OSS furthermore makes the distinction that even if only {\it some} of the alerts for a given visit are distributed later than {\tt OTT1}, it counts towards {\it sciVisitAlertDelay}. The DMSR makes no statements about the fraction of visits with failed/delayed alert distribution.
+
+\textcolor{red}{Tension in the Formal Requirements Definitions --} The OSS requirements do not use {\tt OTR1} to define a failed/delayed visit (see \S~\ref{ssec:OTR1}); instead, if a visit has any number of alerts delayed beyond {\tt OTT1} it is considered as counting towards {\tt sciVisitAlertDelay}. Should this be changed?
+
+\textcolor{red}{Requirement Breach Protocol --} Are alerts from a delayed visit flagged in some way?
+
+
+% % % % % % % % % % % % %
+\subsection{Fraction of Alerts per Visit with Delayed Distribution}\label{ssec:OTR1}
+
+It is a formal requirement that $98\%$ of all alerts for a given visit are issued within $60$ seconds.
+
+{\bf Formal Requirements --} The SRD does not say anything on this topic. As mentioned in \S~\ref{ssec:OTT1}, the LSR defines {\tt OTR1} as the {\it ``fraction of detectable alerts for which an alert is actually transmitted within latency {\tt OTT1}"}, where {\tt OTR1} $=98\%$ (LSR-REQ-0025; \citeds{LSE-29}). The OSS does not state any requirements on the fraction of failed alerts per visit (but see \S~\ref{ssec:sciVisitAlertFailure}). The DMSR makes no statements about the fraction of alerts per visit with delayed/failed distribution.
+
+\textcolor{red}{Tension in the Formal Requirements Definitions --} LSR-REQ-0025 and {\tt OTR1} do not appear to have flowed down to the OSS or DMSR, and {\tt OTR1} does not seem to actually be used for anything (unless it's flowed down to science verification?). Also, {\tt OTR1} specifies the fraction of alerts that can be delayed beyond {\tt OTT1}, but there is no specification for an acceptable fraction of alerts which completely fail to be distributed (i.e., like {\tt sciVisitAlertFailure}, but for alerts per visit); should there be? Is it $0$?
+
+\textcolor{red}{Requirement Breach Protocol --} With regards to {\tt OTR1} $=98\%$, LSR-REQ-0025 states that {\it `` the remaining transients so detectable must still be identified and recorded at the next processing opportunity"}, but this is not this flowed down to DMSR, and it is unclear what {\it ``the next processing opportunity"} means.
+
+
+% % % % % % % % % % % % %
+\subsection{Fraction of False Positives per Visit}\label{ssec:false_positives}
+
+There is no formal requirement on the fraction of false positives per visit, only that threshold values be supplied, which can be used to filter the detections into a subsample with known upper limits of completeness and purity.
+
+{\bf Formal Requirements --} The SRD makes no statements about alert stream purity or completeness, but does quote that the {\it ``minimum signal-to-noise ratio in difference image for reporting detection of a transient object"} has a design specification of {\tt transSNR} $=5$ \citedsp{LPM-17}. The LSR contains essentially the same definition for {\tt transSNR}, {\it ``the signal-to-noise ratio in single-visit difference images above which all optical transients are to be reported"} (LSR-REQ-0101; \citeds{LSE-29}). There is no minimum specification or stretch goal associated with {\tt transSNR}. The OSS requires that {\it ``there shall exist a spuriousness threshold {\tt T} for which the completeness and purity of selected difference sources are higher than {\tt transCompletenessMin} and {\tt transPurityMin}, respectively, at the SNR detection threshold {\tt transSampleSNR}. This requirement is to be interpreted as an average over the entire survey"} (OSS-REQ-0353; \citeds{LSE-30}). In other words, the DMS must be able to provide the value for a spuriousness threshold {\tt T}, below which all difference sources detected with a signal-to-noise ratio {\tt transSampleSNR} $=6$, over the entire LSST survey, have {\tt transCompletenessMin} $=90\%$ and {\tt transPurityMin} $=95\%$. This is not the same as a formal requirement on the fraction of false positives per visit in the alert stream, but the spuriousness threshold {\tt T} will allow users to filter their stream to a fiducial completeness and purity. The DMSR does not appear to have any requirements on the fraction of false positives. 
+
+{\bf The SR\&SSS estimates that the number of alerts per visit due to false positives will be $5050$ alerts, or $\sim50\%$ of all alerts \citedsp{LSE-81}.} Based on a footnote on page 19 of \citeds{LDM-151}, which states that {\it ``50\% false positive rate is given in the OSS (when discussing Solar System Object requirements) and impacts the sizing model for the alert stream"}, it appears that this stems from the OSS specification that {\it ``There shall exist a spuriousness threshold {\tt T} for which the completeness and purity of difference sources are higher than {\tt mopsCompletenessMin} and {\tt mopsPurityMin}, respectively, at the SNR detection threshold {\tt orbitObservationThreshold}. This requirement is intended to be interpreted as an average for any one month of observing"}, where {\tt orbitObservationThreshold} $=5$, {\tt mopsCompletenessMin} $=99\%$, and {\tt mopsPurityMin} $=50\%$ (OSS-REQ-0354; \citeds{LSE-30}).
+
+
+% % % % % % % % % % % % %
+\subsection{Alert Packet Size}\label{ssec:packet_size}
+
+There are no formal requirements regarding the alert packet size. The size of an individual alert packet is estimated to be $\sim82$ $\rm KB$ (without schema or compression).
+
+% (30x30) x  2(32+32+16) = 144000 bits = 18000 bytes = 17.6 kB
+{\bf Sizing Estimate --} Alert packet contents will include all of the LSST science data for the triggering detection, including a $\sim12$ month historical record of detections, plus image stamp cutouts. Alert contents are described in more detail in Section 3.5 of \citeds{LSE-163}. Simulated alert packets based on the Apache Avro format average $\sim82$/$126$ $\rm KB$ with and without the schema, respectively. The application of gzip compression can further reduce these sizes to $\sim68$/$65$ $\rm KB$ (JIRA ticket DM-16280). Cutout stamps included in the alert will be at least $30\times30$ pixels and contain flux (32 bit/pix), variance (32 bit/pix), and mask (16 bit/pix) extensions for both the template and difference image, plus a header of metadata \citedsp{LSE-163}. The stamps alone will contribute $\gtrsim18$ $\rm KB$ to the total size of the uncompressed alert packet. 
+
+\textcolor{red}{What if brokers plan to do all the associations, and want an alert packet ``lite" with no historical information and/or no stamps? Is that an option?}
+
+\textcolor{red}{It might be useful to quote the distribution of alert packet sizes by doing a larger simulation.}
+
+
+% % % % % % % % % % % % %
+\subsection{Alert Stream Data Rate}\label{ssec:data_rate}
+
+There are no formal requirements regarding the alert stream data rate. The time-averaged data rate of the alert stream is estimated to be $\sim27$ $\rm MB/sec$ (for alert packets without schema or compression).
+
+{\bf Sizing Estimate --} The size of a single LSST alert will be $\sim82$ $\rm KB$ (including image stamps but not schema nor compression). Using an average of $\sim10000$ alerts released per $\sim30$ second image, this leads to a {\it continuous} alert stream data rate of  $\sim27$ $\rm MB\ s^{-1}$. 
+
+\textcolor{red}{Quoting a Peak Flow Value --} The $10000$ alerts per visit probably aren't going to be released evenly over the 60 seconds so we should quote the maximum expected stream rate. E.g., \citeds{LDM-612} says {\it ``about $7$ brokers can receive the full stream if $5$ seconds of the $60$ second latency budget is devoted to outbound data transfer"}, but does that mean brokers should expect bursts of an alert stream for $5$ out of every $60$ seconds -- which would be $\sim150$ $\rm MB\ s^{-1}$ for $5$ seconds? Is than an acceptable upper limit?
+
+\textcolor{red}{Quoting a Data Rate for Filtered Streams --} If pre-filtering will be offered, it might be useful to quote stream rates for the expected common filtering. For example, if a broker wants to limit its incoming flow to an alert stream with {\tt transCompletenessMin} $=90\%$ and {\tt transPurityMin} $=95\%$ (i.e., apply {\tt spuriousness} threshold {\tt T}; \S~\ref{ssec:false_positives}), then given the purity of the {\tt transSNR} $>5$ stream is only $\sim50\%$ (\S~\ref{ssec:false_positives} and \citeds{LSE-81}) this might decrease the stream by $\sim40\%$. 
+
+
+
+% % % % % % % % % % % % %
+\subsection{Number of Selected Brokers}\label{ssec:num_brokers}
+
+There are no formal requirements on the number of brokers. The DM team estimates that resources will allow for the delivery of the alert stream to $4$-$7$ brokers.
+
+{\bf Formal Requirements --} Neither the SRD, LSR, OSS, nor the DMSR place any formal requirements on -- or even mention -- the number of brokers that the alert stream should be delivered to. \textcolor{red}{MLG: I thought {\it somewhere} a minimum of at least 4 was stated as a formal requirement?} Neither the DPDD nor the SR\&SSS mention an estimate for the number of brokers. 
+
+{\bf Sizing Estimate --} As described in \citeds{LDM-612}, {\it ``An allocation of $10$ $\rm Gbps$ is baselined for alert stream transfer from the [LSST Data Facility (LDF)]. With an estimated packet size of $\sim82$ $\rm KB$ and $10000$ alerts per visit, about $7$ brokers can receive the full stream if $5$ seconds of the $60$ second latency budget is devoted to outbound data transfer."} \textcolor{red}{Citation for the allocation of 10 Gbps?}
+
+
+% % % % % % % % % % % % %
+\subsection{Alert Database Volume}\label{ssec:adb_volume}
+
+There are no formal requirements on the alerts database volume. The estimated upper limit is $\lesssim3$ $\rm PB$ (without schema or compression).
+
+% 10,000,000 alerts per night * 82 KB/alert = 820,000,000 KB per night = 782 GB/night
+{\bf Sizing Estimate --} An upper estimate is derived by starting with a maximum of $\sim1000$ visits per night, and $\sim10000$ alerts per visit, which amounts to $\sim 10$ million alerts per night. At $\sim82$ $\rm KB$ per alert (\S~\ref{ssec:packet_size}), that leads to a total of $\sim782$ $\rm GB$ per night. An extreme upper limit is $365$ nights per year for 10 years, which would amount to $\sim2.7$ $\rm PB$ {\it at the very most}. Therefore we quote an upper limit on the alerts database as $\lesssim3$ $\rm PB$. Compression could drastically lower this, as could reformatting: every alert contains a $\sim12$ month historical record and links to the most recent DIAObject and DR Object catalogs. The set of alerts for the same transient/variable would contain significant redundant information which could be reformatted (i.e., removed and compiled).
+
+
+% % % % % % % % % % % %
+\subsection{Number of New Transients per Visit}
+
+Estimate unclear. Need for quoting it here also unclear (except, it is called out in the spreadsheet).
+
+\textcolor{red}{MLG thoughts --} This would refer to new, unassociated {\tt DIASources} which are not false. The SR\&SSS quotes the {\it ``average number of alerts per visit due to new transients"} as 100, with no reference (Science Book maybe?). Here we could quote, for example, the average number of unassociated DIASources in either a new WFD extragalactic image or a new Galactic Plane image of a field that has not been observed in $3$ days. Or the predicted number of unassociated DIASources which are actually new/first detections of moving objects. Brainstorm other useful quantities for brokers.
+
+
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\section{Mini-Broker} \label{sec:minibroker}
+
+It is a formal requirement that the LSST provide a simple alerts filtering service for users, which is hereafter referred to as the LSST Mini-Broker.
+
+{\bf Formal Requirements --} The SRD specifies that {\it ``users will have an option of a query-like pre-filtering of [the alert] data stream in order to select likely candidates for specific transient type"} and that {\it ``several pre-defined filters optimized for traditionally popular transients, such as supernovae and microlensed sources, will also be available"} \citedsp{LPM-17}. Neither the LSR nor the OSS have a formal requirement on this capability, as it is a product of the DMS. The DMSR has a formal requirement that {\it ``a basic, limited capacity, alert filtering service shall be provided that can be given user defined filters to reduce the alert stream to manageable levels"}, and that this service include {\it ``a predefined set of simple filters"} (DMS-REQ-0342, -0348; \citeds{LSE-61}). 
+
+\textcolor{red}{The term ``user" in the DMSR is assumed to mean individual with data rights? Even when discussing public data products?}
+
+
+% % % % % % % % % % % % %
+\subsection{Number of Simultaneous Mini-Broker Users}\label{ssec:minib_users}
+
+It is a formal requirement that the mini-broker support a minimum of $100$ simultaneous users.
+
+{\bf Formal Requirements --} The DMSR specifies that the LSST {\it ``alert filtering service shall support {\tt numBrokerUsers} simultaneous users"}, where {\tt numBrokerUsers} $=100$ (DMS-REQ-0343; \citeds{LSE-61}).
+
+\textcolor{red}{MLG: I can't find the background numbers that drive this limit of 100.}
+
+% % % % % % % % % % % % %
+\subsection{Number of Alerts per Visit Returned per User-Defined Filter}\label{ssec:minib_returns}
+
+It is a formal requirement that the mini-broker return $20$ alerts per visit per user.
+
+{\bf Formal Requirements --} The DMSR specifies that within the LSST alert filtering service {\it ``each user [shall be] allocated a bandwidth capable of receiving the equivalent of {\tt numBrokerAlerts} alerts per visit"}, where {\tt numBrokerAlerts} $=20$ (DMS-REQ-0343; \citeds{LSE-61}).
+
+\textcolor{red}{MLG: I can't find the background numbers that drive this limit of 20.}
+
+\textcolor{red}{Requirement Drivers --} Note that in a footnote of \citeds{LDM-612}, it says that the {\it ``requirement on the number of simultaneously connected users and number of passed alerts is largely driven by outbound bandwidth limitations from the DAC at NCSA. We are investigating approaches that would support larger numbers of active filters"} (page 12; \citeds{LDM-612}).  I can't find any references to mini-broker capacities in the SR\&SSS.
+
+
+% % % % % % % % % % % % %
+\subsection{Alerts Database Query Latency}
+
+It is a formal requirement that {\it ``All published transient alerts ... shall be available for query"} (OSS-REQ-0185; \citeds{LSE-30}). \textcolor{red}{It is unclear whether {\tt OTT1} $=1$ minute or {\tt L1PublicT} $=24$ hours applies to the availability of alerts in the database. MLG: I think it should be the latter but am still looking for the proof in the docs.}
+
+
+
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\subsection{Summary}
+
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\clearpage
+
+% Include all the relevant bib files.
+% https://lsst-texmf.lsst.io/lsstdoc.html#bibliographies
+\bibliography{local,lsst,lsst-dm,refs_ads,refs,books}
+
+\end{document}

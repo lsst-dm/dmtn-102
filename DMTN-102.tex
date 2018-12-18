@@ -20,7 +20,7 @@
 % \setDocSubtitle{A subtitle}
 
 \author{%
-M.~L.~Graham, E.~Bellm, C.~T.~Slater, L.~Guy, et al.
+M.~L.~Graham, E.~Bellm, L.~Guy, C.~T.~Slater, et al.
 }
 
 \setDocRef{DMTN-102}
@@ -158,9 +158,6 @@ There are no formal requirements regarding the alert stream data rate. The {\it 
 
 {\bf Sizing Estimate --} The size of a single LSST alert will be $\sim82$ $\rm KB$ (including image stamps but not schema nor compression). Using an average of $\sim10000$ alerts released per $\sim30$ second image, this leads to a {\it time-averaged} alert stream data rate of  $\sim27$ $\rm MB\ s^{-1}$. As discussed in \S~\ref{ssec:transN}, the number of alerts per field will vary in extra/galactic fields from $\sim2000$ to $\lesssim40000$, which would produce {\it time-averaged} alert streams of $\sim5.4$ to $\lesssim108$ $\rm MB\ s^{-1}$. However, in order to release alerts within {\tt OTT1} $=60$ seconds of image readout (\S~\ref{ssec:OTT1}), the stream will not be continuous in time, but periodic, with potential bursts. For example, if all $10000$ alerts are issued within the last $5$ seconds of {\tt OTT1} this would produce a data rate of $160$ $\rm MB\ s^{-1}$; in galactic fields with $\lesssim40000$ alerts this could be as high as $640$ $\rm MB\ s^{-1}$.
 
-\textcolor{red}{Quoting a Data Rate for Filtered Streams --} If pre-filtering will be offered, it might be useful to quote stream rates for the expected common filtering. For example, if a broker wants to limit its incoming flow to an alert stream with {\tt transCompletenessMin} $=90\%$ and {\tt transPurityMin} $=95\%$ (i.e., apply {\tt spuriousness} threshold {\tt T}; \S~\ref{ssec:comp_pure}), then given the purity of the {\tt transSNR} $>5$ stream is only $\sim50\%$ (\S~\ref{ssec:comp_pure} and \citeds{LSE-81}) this might decrease the stream by $\sim40\%$. 
-
-
 
 % % % % % % % % % % % % %
 \subsection{Number of Selected Brokers}\label{ssec:num_brokers}
@@ -218,11 +215,15 @@ Should there be a specification which is like {\tt OTR1} (which specifies that $
 
 It is a formal requirement that DM derive and supply threshold values for a {\it spuriousness} parameter (also known as {\it real/bogus}), which can be used to filter all alerts into a subsample with a specified completeness and purity, and reduce the fraction of false positives per visit (i.e., sources detected that are not astrophysical in origin).
 
-{\bf Formal Requirements --} The SRD makes no statements about alert stream purity or completeness, but does quote that the {\it ``minimum signal-to-noise ratio in difference image for reporting detection of a transient object"} has a design specification of {\tt transSNR} $=5$ \citedsp{LPM-17}. The LSR contains essentially the same definition for {\tt transSNR}, {\it ``the signal-to-noise ratio in single-visit difference images above which all optical transients are to be reported"} (LSR-REQ-0101; \citeds{LSE-29}). There is no minimum specification or stretch goal associated with {\tt transSNR}. The OSS requires that {\it ``there shall exist a spuriousness threshold {\tt T} for which the completeness and purity of selected difference sources are higher than {\tt transCompletenessMin} and {\tt transPurityMin}, respectively, at the SNR detection threshold {\tt transSampleSNR}. This requirement is to be interpreted as an average over the entire survey"} (OSS-REQ-0353; \citeds{LSE-30}). In other words, the DMS must be able to provide the value for a spuriousness threshold {\tt T}, below which all difference sources detected with a signal-to-noise ratio {\tt transSampleSNR} $=6$, over the entire LSST survey, have {\tt transCompletenessMin} $=90\%$ and {\tt transPurityMin} $=95\%$. This is not the same as a formal requirement on the fraction of false positives per visit in the alert stream, but the spuriousness threshold {\tt T} will allow users to filter their stream to a fiducial completeness and purity. The DMSR does not appear to have any requirements on the fraction of false positives. 
+{\bf Formal Requirements --} The SRD makes no statements about alert stream purity or completeness, but does quote that the {\it ``minimum signal-to-noise ratio in difference image for reporting detection of a transient object"} has a design specification of {\tt transSNR} $=5$ \citedsp{LPM-17}. The LSR contains essentially the same definition for {\tt transSNR}, {\it ``the signal-to-noise ratio in single-visit difference images above which all optical transients are to be reported"} (LSR-REQ-0101; \citeds{LSE-29}). There is no minimum specification or stretch goal associated with {\tt transSNR}. However, as described in the DPDD, detections with {\tt transSNR} $>5$ but {\it ``with high probability of being instrumental non-astrophysical artifacts may be excluded"} (Section 3.1, \citeds{LSE-163}), and a limited number of {\tt transSNR} $<5$ sources might be allowed to generate alerts (e.g., sources near a gravitational keyhole which could make an asteroid potentially hazardous; Section 3.2.1, \citeds{LSE-163}).
 
-{\bf The SR\&SSS estimates that the number of alerts per visit due to false positives will be $5050$ alerts, or $\sim50\%$ of all alerts \citedsp{LSE-81}.} Based on a footnote on page 19 of \citeds{LDM-151}, which states that {\it ``50\% false positive rate is given in the OSS (when discussing Solar System Object requirements) and impacts the sizing model for the alert stream"}, it appears that this stems from the OSS specification that {\it ``There shall exist a spuriousness threshold {\tt T} for which the completeness and purity of difference sources are higher than {\tt mopsCompletenessMin} and {\tt mopsPurityMin}, respectively, at the SNR detection threshold {\tt orbitObservationThreshold}. This requirement is intended to be interpreted as an average for any one month of observing"}, where {\tt orbitObservationThreshold} $=5$, {\tt mopsCompletenessMin} $=99\%$, and {\tt mopsPurityMin} $=50\%$ (OSS-REQ-0354; \citeds{LSE-30}).
+Regarding the alert stream completeness and purity, the OSS requires that {\it ``there shall exist a spuriousness threshold {\tt T} for which the completeness and purity of selected difference sources are higher than {\tt transCompletenessMin} and {\tt transPurityMin}, respectively, at the SNR detection threshold {\tt transSampleSNR}. This requirement is to be interpreted as an average over the entire survey"} (OSS-REQ-0353; \citeds{LSE-30}). In other words, the DMS must be able to provide the value for a spuriousness threshold {\tt T}, below which all alerts detected with a signal-to-noise ratio {\tt transSampleSNR} $=6$, over the entire LSST survey, have {\tt transCompletenessMin} $=90\%$ and {\tt transPurityMin} $=95\%$. (For moving objects there is a separate specification for a threshold pertaining to {\tt transSampleSNR} $=5$, {\tt mopsCompletenessMin} $=99\%$, and {\tt mopsPurityMin} $=50\%$; OSS-REQ-0354, \citeds{LSE-30}). This spuriousness threshold {\tt T} will allow users to filter their stream to a fiducial completeness and purity; brokers may request a pre-filtered stream that includes a restriction on spuriousness.
+
+%%% MLG: removed because essentially was integrated into Formal Requirements
+% {\bf The SR\&SSS estimates that the number of alerts per visit due to false positives will be $5050$ alerts, or $\sim50\%$ of all alerts \citedsp{LSE-81}.} Based on a footnote on page 19 of \citeds{LDM-151}, which states that {\it ``50\% false positive rate is given in the OSS (when discussing Solar System Object requirements) and impacts the sizing model for the alert stream"}, it appears that this stems from the OSS specification that {\it ``There shall exist a spuriousness threshold {\tt T} for which the completeness and purity of difference sources are higher than {\tt mopsCompletenessMin} and {\tt mopsPurityMin}, respectively, at the SNR detection threshold {\tt orbitObservationThreshold}. This requirement is intended to be interpreted as an average for any one month of observing"}, where {\tt orbitObservationThreshold} $=5$, {\tt mopsCompletenessMin} $=99\%$, and {\tt mopsPurityMin} $=50\%$ (OSS-REQ-0354; \citeds{LSE-30}).
 
 
+%%% MLG: Removed because this is more of a science derivative than key number.
 % % % % % % % % % % % %
 % \subsection{Number of New Transients per Visit}
 % 
@@ -247,7 +248,6 @@ It is a formal requirement that the AFS support a minimum of $100$ simultaneous 
 
 {\bf Formal Requirements --} The DMSR specifies that the LSST {\it ``alert filtering service shall support {\tt numBrokerUsers} simultaneous users"}, where {\tt numBrokerUsers} $=100$ (DMS-REQ-0343; \citeds{LSE-61}).
 
-\textcolor{red}{MLG: I can't find the background numbers that drive this limit of 100.}
 
 % % % % % % % % % % % % %
 \subsection{Number of Alerts per Visit Returned per User-Defined Filter}\label{ssec:AFS_returns}
@@ -256,14 +256,14 @@ It is a formal requirement that the AFS return $20$ alerts per visit per user.
 
 {\bf Formal Requirements --} The DMSR specifies that within the LSST alert filtering service {\it ``each user [shall be] allocated a bandwidth capable of receiving the equivalent of {\tt numBrokerAlerts} alerts per visit"}, where {\tt numBrokerAlerts} $=20$ (DMS-REQ-0343; \citeds{LSE-61}).
 
-\textcolor{red}{Requirement Drivers --} Note that in a footnote of \citeds{LDM-612}, it says that the {\it ``requirement on the number of simultaneously connected users and number of passed alerts is largely driven by outbound bandwidth limitations from the DAC at NCSA. We are investigating approaches that would support larger numbers of active filters"} (page 12; \citeds{LDM-612}). MLG: I can't find any references to LAFS capacities in the SR\&SSS.
+Note that in a footnote of \citeds{LDM-612}, it says that the {\it ``requirement on the number of simultaneously connected users and number of passed alerts is largely driven by outbound bandwidth limitations from the DAC at NCSA. We are investigating approaches that would support larger numbers of active filters"} (page 12; \citeds{LDM-612}).
 
 % % % % % % % % % % % % %
 \subsection{Alerts Database Query Latency}
 
-It is a formal requirement that {\it ``All published transient alerts ... shall be available for query"} (OSS-REQ-0185; \citeds{LSE-30}). Like all other Prompt data products, the Alerts Database will be updated within {\tt L1PublicT} $=24$ hours.
+It is a formal requirement that all alerts be stored in a database and available for query (by users with data rights and access to the science platform).
 
-{\bf Formal Requirements --} \textcolor{red}{Just point to the L1PublicT requirement.}
+{\bf Formal Requirements --} The OSS states that {\it ``All published transient alerts ... shall be available for query"} (OSS-REQ-0185; \citeds{LSE-30}). Like all other Prompt data products, the Alerts Database will be updated within {\tt L1PublicT} $=24$ hours (LSR-REQ-0104, \citeds{LSE-29}).
 
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %

@@ -153,34 +153,33 @@ Regarding the alert stream completeness and purity, the OSS requires that {\it "
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 \section{The LSST Alert Filtering Service} \label{sec:LAFS}
 
-It is a formal requirement that the LSST provide a simple alerts filtering service for users (individuals with LSST data rights and access to the Science Platform), which is hereafter referred to as the LSST alert filtering service (AFS).
+{\bf It is a formal requirement that the LSST provide a simple alerts filtering service for users (individuals with LSST data rights and access to the Science Platform), which is hereafter referred to as the LSST alert filtering service (LAFS).}
 
-{\bf Formal Requirements --} The SRD specifies that {\it "users will have an option of a query-like pre-filtering of [the alert] data stream in order to select likely candidates for specific transient type"} and that {\it "several pre-defined filters optimized for traditionally popular transients, such as supernovae and microlensed sources, will also be available"} \citedsp{LPM-17}. Neither the LSR nor the OSS have a formal requirement on this capability, as it is a product of the DMS. The DMSR has a formal requirement that {\it "a basic, limited capacity, alert filtering service shall be provided that can be given user defined filters to reduce the alert stream to manageable levels"}, and that this service include {\it "a predefined set of simple filters"} (DMS-REQ-0342, -0348; \citeds{LSE-61}). 
-
-
-% % % % % % % % % % % % %
-\subsection{Number of Simultaneous AFS Users}\label{ssec:AFS_users}
-
-It is a formal requirement that the AFS support a minimum of $100$ simultaneous users.
-
-{\bf Formal Requirements --} The DMSR specifies that the LSST {\it "alert filtering service shall support {\tt numBrokerUsers} simultaneous users"}, where {\tt numBrokerUsers} $=100$ (DMS-REQ-0343; \citeds{LSE-61}).
+The SRD specifies that {\it "users will have an option of a query-like pre-filtering of the [alert] data stream in order to select likely candidates for specific transient type"} and that {\it "several pre-defined filters optimized for traditionally popular transients, such as supernovae and microlensed sources, will also be available"} \citedsp{LPM-17}. This flows down directly to the DMSR, which has a formal requirement that {\it "a basic, limited capacity, alert filtering service shall be provided that can be given user defined filters to reduce the alert stream to manageable levels"}, and that this service include {\it "a predefined set of simple filters"} (DMS-REQ-0342, -0348; \citeds{LSE-61}). 
 
 
 % % % % % % % % % % % % %
-\subsection{Number of Alerts per Visit Returned per User-Defined Filter}\label{ssec:AFS_returns}
+\subsection{Number of Simultaneous LAFS Users}\label{ssec:LAFS_users}
 
-It is a formal requirement that the AFS return $20$ alerts per visit per user.
+{\bf It is a formal requirement that the LAFS be able to support a minimum of $100$ simultaneous users.}
 
-{\bf Formal Requirements --} The DMSR specifies that within the LSST alert filtering service {\it "each user [shall be] allocated a bandwidth capable of receiving the equivalent of {\tt numBrokerAlerts} alerts per visit"}, where {\tt numBrokerAlerts} $=20$ (DMS-REQ-0343; \citeds{LSE-61}).
+The DMSR specifies that the LSST {\it "alert filtering service shall support {\tt numBrokerUsers} simultaneous users"}, where {\tt numBrokerUsers} $=100$ (DMS-REQ-0343; \citeds{LSE-61}).
 
-Note that in a footnote of \citeds{LDM-612}, it says that the {\it "requirement on the number of simultaneously connected users and number of passed alerts is largely driven by outbound bandwidth limitations from the DAC at NCSA. We are investigating approaches that would support larger numbers of active filters"} (page 12; \citeds{LDM-612}).
 
 % % % % % % % % % % % % %
-\subsection{Alerts Database Query Latency}
+\subsection{Number of Alerts per Visit Returned by LAFS}\label{ssec:LAFS_returns}
 
-It is a formal requirement that all alerts be stored in a database and available for query (by users with data rights and access to the science platform).
+{\bf It is a formal requirement that the LAFS be able to return $20$ alerts per visit per user.}
 
-{\bf Formal Requirements --} The OSS states that {\it "All published transient alerts ... shall be available for query"} (OSS-REQ-0185; \citeds{LSE-30}). Like all other Prompt data products, the Alerts Database will be updated within {\tt L1PublicT} $=24$ hours (LSR-REQ-0104, \citeds{LSE-29}).
+The DMSR specifies that within the LSST alert filtering service {\it "each user [shall be] allocated a bandwidth capable of receiving the equivalent of {\tt numBrokerAlerts} alerts per visit"}, where {\tt numBrokerAlerts} $=20$ (DMS-REQ-0343; \citeds{LSE-61}). However, note that in a footnote of \citeds{LDM-612}, it says that the {\it "requirement on the number of simultaneously connected users and number of passed alerts is largely driven by outbound bandwidth limitations from the DAC at NCSA. We are investigating approaches that would support larger numbers of active filters"} (page 12; \citeds{LDM-612}).
+
+
+% % % % % % % % % % % % %
+\subsection{Alerts Database}\label{ssec:LAFS_adb}
+
+{\bf It is a formal requirement that all alerts be stored in a database and available for query.}
+
+The OSS states that {\it "All published transient alerts ... shall be available for query"}, and this applies to users with data rights and access to the LSST science platform (OSS-REQ-0185; \citeds{LSE-30}). Like all other Prompt data products, the alerts database will be updated within {\tt L1PublicT} $=24$ hours (LSR-REQ-0104, \citeds{LSE-29}). The alerts database is not a part of LAFS, but is included in this section to emphasize that science users who do not need a latency of $<24h$ should be querying the alerts database {\it instead of} creating LAFS filters.
 
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %

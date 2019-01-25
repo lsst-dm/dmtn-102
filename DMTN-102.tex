@@ -93,7 +93,7 @@ The term "make available" refers to the point at which an LSST alert packet beco
 % % % % % % % % % % % % %
 \subsection{Number of Alerts per Visit (and per Night)}\label{ssec:transN}
 
-{\bf It is a formal requirement that the DMS sustain the generation of an average\reqparam{transN}\lsrreq{0101}\reqparam{nAlertVisitAvg}\ossreq{0193} of at least $10,000$ alerts per visit\footnote{The design, minimum, and stretch values for the number of alerts per visit are $10^4$, $10^3$, and $10^5$ \citedsp{LPM-17}.}, and an instantaneous maximum of at least $40,000$ alerts per visit.}
+{\bf It is a formal requirement that the DMS support the generation of \reqparam{transN}\lsrreq{0101}\reqparam{nAlertVisitAvg}\ossreq{0193} at least $10,000$ alerts per visit\footnote{The design, minimum, and stretch values for the number of alerts per visit are $10^4$, $10^3$, and $10^5$ \citedsp{LPM-17}.} on average, and an instantaneous maximum of $40,000$ alerts per visit.}
 
 % The formal requirements on the DMS's ability to generate a minimum number of alerts per visit are defined by the SRD \citedsp{LPM-17}, LSR-REQ-0101 \citedsp{LSE-29}, and OSS-REQ-0193 \citedsp{LSE-30}. 
 
@@ -178,7 +178,7 @@ The formal requirement is that DM calculate a spuriousness parameter for all ale
 
 {\bf It is a formal requirement that the LSST provide an alerts filtering service for users.}\dmreq{0342}\dmreq{0348} 
 
-The LSST alerts filtering service is a mechanism by which users -- individuals with LSST data rights and access -- can receive alerts via pre-defined filters that have been optimized for established transient classifications such as supernovae, and/or create and apply their own filters to the stream \citedsp{LPM-17,LSE-61}. 
+The LSST alerts filtering service is a mechanism by which users --- individuals with LSST data rights and access --- can receive alerts via pre-defined filters that have been optimized for established transient classifications such as supernovae and/or create and apply their own filters to the stream \citedsp{LPM-17,LSE-61}. 
 
 % The SRD specifies that {\it "users will have an option of a query-like pre-filtering of the [alert] data stream in order to select likely candidates for specific transient type"} and that {\it "several pre-defined filters optimized for traditionally popular transients, such as supernovae and microlensed sources, will also be available"} \citedsp{LPM-17}. This flows down directly to the DMSR, which has a formal requirement that {\it "a basic, limited capacity, alert filtering service shall be provided that can be given user defined filters to reduce the alert stream to manageable levels"}, and that this service include {\it "a predefined set of simple filters"} (DMS-REQ-0342, -0348; \citeds{LSE-61}). 
 
@@ -186,7 +186,7 @@ The LSST alerts filtering service is a mechanism by which users -- individuals w
 % % % % % % % % % % % % %
 \subsection{Number of Simultaneous Users}\label{ssec:LAFS_users}
 
-{\bf It is a formal requirement that the LSST alert filtering service be able to support\reqparam{numBrokerUsers}\dmreq{0343} a minimum of $100$ simultaneous users.}
+{\bf It is a formal requirement that the LSST alert filtering service be able to support\reqparam{numBrokerUsers}\dmreq{0343} at least $100$ simultaneous users.}
 
 This requirement is driven by outbound bandwidth limitations from the Data Access Center at the National Center for Supercomputing Applications, and the DM team is currently investigating approaches that would support larger numbers of active filters \citedsp{LDM-612}. During LSST Operations, if the total number of simultaneous users is oversubscribed then a proposal process may be instituted \citedsp{LSE-163}.
 
@@ -206,11 +206,13 @@ Assuming $1,000$ visits per night (\S~\ref{ssec:transN}), each user's filter wil
 
 
 % % % % % % % % % % % % %
-\subsection{Alerts Database}\label{ssec:LAFS_adb}
+\subsection{Alerts Archive}\label{ssec:LAFS_adb}
 
-{\bf It is a formal requirement that all alerts be stored in a database and available for query.}\ossreq{0185}
+{\bf It is a formal requirement that all alerts be stored in an archival database and be available for retrieval.}\ossreq{0185}
 
-The term "available for query" applies to users with data rights and access to the LSST Science Platform. Like all other Prompt data products, the alerts database will be updated within $24$\reqparam{L1PublicT}\lsrreq{0104} hours \citedsp{LSE-29}. The alerts database is not a part of the LSST alert filtering service, but is included in this section to emphasize that science users who do not need a latency of $<24$ hours may wish to query the alerts database instead of creating filters.
+The term "available for retrieval" applies to users with data rights and access to the LSST Science Platform. Like all other Prompt data products, the alerts archive will be updated within $24$\reqparam{L1PublicT}\lsrreq{0104} hours \citedsp{LSE-29}. The alerts archive is not a part of the LSST alert filtering service, but is included in this section to raise awareness of its existence. 
+
+The LSST DM team anticipates that the alerts archive will support queries by the unique alert identification numbers, but might not support searches by coordinate, time, magnitude, or other alert attributes. For this reason, the alerts archive should {\em not} be considered a viable alternative for users who {\em do} wish to study transient, variable and moving objects with the LSST, but who {\em do not} require immediate (i.e., same-night) access to sources detected via difference image analysis. In other words, queries to the alerts archival database should not be construed as a viable alternative to community brokers or the LSST alert filtering service. Instead, users with science goals that are achievable with a latency of $\geq24$ hours should plan to use the Prompt data products described in Section 3 of \citeds{LSE-163}.
 
 % The OSS states that {\it "All published transient alerts ... shall be available for query"}, and this applies to users with data rights and access to the LSST science platform (OSS-REQ-0185; \citeds{LSE-30}).
 

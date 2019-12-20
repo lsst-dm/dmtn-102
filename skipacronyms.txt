@@ -1,0 +1,4 @@
+#Put acronyms in this file which you want to ignore (initials of people single letters .. 
+LAFS
+OTT1 
+OTR1

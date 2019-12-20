@@ -152,8 +152,7 @@ There are no requirements on the alerts database volume. The statement above is 
 
 These requirements apply to standard visits which should have produced $\leq$40,000 alerts. For example, a visit would be considered "delayed" and count towards that 1\% limit if $>$2\% of its alerts were distributed with a latency of $>$60 seconds. The requirement that no more than 0.1\% of all science visits fail to generate and/or distribute alerts is integrated over all stages of data handling, not just alert distribution, and includes failures at any stage of prompt processing.
 
-For an average of 10,000 alerts per visit and 1,000 visits per night, this requirement allows the \gls{DMS} to distribute up to 2\% (200,000 alerts per night) with a latency $>$60 seconds after image readout. 
-% Assuming $\sim$10 million alerts per night (\S~\ref{ssec:transN}), brokers can rely on the DMS to not exceed an upper limit of 200,000 alerts (2\%) being made available with a latency of $>$60 seconds, and an upper limit of 10,000 alerts (or 1 visit's worth, i.e., 0.1\% of 1,000 visits per night) that fail to be generated and/or made available. 
+For an average of 10,000 alerts per visit and 1,000 visits per night, this requirement allows the \gls{DMS} to distribute up to 2\% (200,000 alerts per night) with a latency $>$60 seconds after image readout.
 The worst-case scenario for a night of alert distribution which still meets these requirements is if 989 visits all have just under 2\% of their alerts delayed by $>$60 seconds and distributed within 24 hours (197,800 alerts delayed), {\it and} 10 visits (1\%) have all of their alerts distributed with $>$60 seconds and $<$24 hours (100,000 alerts delayed), {\it and} 1 visit (0.1\%) completely fails to generate and/or distribute any alerts (10,000 alerts ).
 
 

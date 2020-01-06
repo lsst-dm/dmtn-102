@@ -1,7 +1,8 @@
 #for dependency you want all tex files  but for acronyms you do not want to include the acronyms file itself.
 tex=$(filter-out $(wildcard *aglossary.tex) , $(wildcard *.tex))  
 
-SRC= DMTN-102.tex
+DOC = DMTN-102
+SRC= $(DOC).tex
 
 OBJ=$(SRC:.tex=.pdf)
 

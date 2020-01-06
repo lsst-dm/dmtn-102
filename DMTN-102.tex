@@ -9,6 +9,8 @@
 \usepackage{enumitem}
 
 % Local commands go here.
+\input{aglossary.tex}
+\makeglossaries
 
 % To add a short-form title:
 % \title[Short title]{Title}
@@ -18,7 +20,7 @@
 % \setDocSubtitle{A subtitle}
 
 \author{%
-M.~L.~Graham, E.~Bellm, L.~Guy, C.~T.~Slater, G.~Dubois-Felsmann, and the Data Management System Science Team
+M.~L.~Graham, E.~Bellm, L.~Guy, C.~T.~Slater, G.~Dubois-Felsmann, and the \gls{Data Management System} Science Team
 }
 
 \setDocRef{DMTN-102}
@@ -30,7 +32,7 @@ M.~L.~Graham, E.~Bellm, L.~Guy, C.~T.~Slater, G.~Dubois-Felsmann, and the Data M
 \setDocUpstreamLocation{\url{https://github.com/lsst-dm/dmtn-102}}
 
 \setDocAbstract{%
-A quantitative review of the key numbers associated with the LSST Alert Stream.
+A quantitative review of the key numbers associated with the \gls{LSST} \gls{Alert} Stream.
 }
 
 % Change history defined here.
@@ -39,6 +41,7 @@ A quantitative review of the key numbers associated with the LSST Alert Stream.
 % See LPM-51 for version number policy.
 \setDocChangeRecord{%
   \addtohist{1}{2019-02-19}{Released.}{Melissa Graham}
+  \addtohist{1.1}{2019-01-06}{Minor updates, added glossary.}{Melissa Graham}
 }
 
 \begin{document}
@@ -50,17 +53,17 @@ A quantitative review of the key numbers associated with the LSST Alert Stream.
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 \section{Introduction} \label{sec:intro}
 
-The LSST Data Management System's (DMS) Alert Production (AP) pipeline will process new data as it is obtained by the telescope. 
-Difference Imaging Analysis (DIA) will be performed, and all sources with a signal-to-noise ratio\reqparam{transSNR}\lsrreq{0101}\dmreq{0269}\dmreq{0274} $>$5 (in positive or negative flux) will be considered "detected", a record will be instantiated in the source catalogs, and an alert generated.
-Each alert is a packet containing LSST data about the source, such as coordinates, photometry, and image cutouts. 
+The \gls{LSST} \gls{Data Management System}'s (\gls{DMS}) \gls{Alert Production} (\gls{AP}) \gls{pipeline} will process new data as it is obtained by the telescope. 
+Difference Imaging Analysis (\gls{DIA}) will be performed, and all sources with a signal-to-noise ratio\reqparam{transSNR}\lsrreq{0101}\dmreq{0269}\dmreq{0274} $>$5 (in positive or negative \gls{flux}) will be considered "detected", a record will be instantiated in the source catalogs, and an alert generated.
+Each alert is a packet containing \gls{LSST} data about the source, such as coordinates, photometry, and image cutouts. 
 For a full description of detected sources and alert packet contents, see \citeds{LSE-163}. 
-The LSST alert stream will be delivered to several community-developed brokers, and also accessible to users\footnote{In this case, "users" is restricted to individuals with LSST data rights and access privileges.} via an alert filtering service through the LSST Data Access Centers (DACs). 
+The \gls{LSST} alert stream will be delivered to several community-developed brokers, and also accessible to users\footnote{In this case, "users" is restricted to individuals with \gls{LSST} data rights and access privileges.} via an alert filtering service through the \gls{LSST} Data Access Centers (DACs). 
 Plans and policies for alert distribution are provided in \citeds{LDM-612}. 
 
-The purpose of this document is to quantitatively inform broker developers, and the broader scientific community planning to use alerts, on the key numbers regarding alert generation, distribution, and access via the LSST alert filtering service. 
+The purpose of this document is to quantitatively inform broker developers, and the broader scientific community planning to use alerts, on the key numbers regarding alert generation, distribution, and access via the \gls{LSST} alert filtering service. 
 The goals of this document are threefold: (1) to provide all of the key numbers regarding alert generation in one place; (2) to include any and all basis information, assumptions, and derivations that contributed to the key number; and (3) to be clear about whether each key number represents an estimate, a requirement, or a boundary. 
-Wherever possible, the reference to a specific LSST requirement and any relevant requirement parameters are provided in the right-hand column. 
-In this document we use 8 bits per byte (B), and 1024~B per KB, 1024~KB per MB, and so forth.
+Wherever possible, the reference to a specific \gls{LSST} requirement and any relevant requirement parameters are provided in the right-hand column. 
+In this document we use 8 bits per byte (\gls{B}), and 1024~B per \gls{KB}, 1024~KB per \gls{MB}, and so forth.
 
 % The resources used in the preparation of this document are as follows:
 % \begin{itemize}
@@ -79,30 +82,30 @@ In this document we use 8 bits per byte (B), and 1024~B per KB, 1024~KB per MB, 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 \section{Alert Stream} \label{sec:alerts}
 
-The concept and existence of the LSST alert stream was first introduced by the highest-level document, the LSST Science Requirements Document \citedsp{LPM-17}, which specifies that information about the detections of transient, variable, and moving objects be released promptly as a data stream. 
+The concept and existence of the \gls{LSST} alert stream was first introduced by the highest-level document, the \gls{LSST} Science Requirements \gls{Document} \citedsp{LPM-17}, which specifies that information about the detections of \gls{transient}, variable, and moving objects be released promptly as a data stream. 
 
 	
 % % % % % % % % % % % % %
-\subsection{Alert Release Timescale}\label{ssec:OTT1}
+\subsection{Alert \gls{Release} Timescale}\label{ssec:OTT1}
 
-{\bf It is a formal requirement that the DMS make available 98\%\reqparam{OTT1}\reqparam{OTR1}\lsrreq{0101}\lsrreq{0025}\ossreq{0127}\dmreq{0004} of alerts for each visit within 60 seconds of the end of image readout\footnote{The design, minimum, and stretch values for the alert release timescale are 1, 2, and 0.5 minutes \citedsp{LPM-17}.}.}
+{\bf It is a requirement that the \gls{DMS} be capable of supporting the distribution of at least 98\%\reqparam{OTT1}\reqparam{OTR1}\lsrreq{0101}\lsrreq{0025}\ossreq{0127}\dmreq{0004} of alerts for each visit within 60 seconds of the end of image readout\footnote{The design, minimum, and stretch values for the alert release timescale are 1, 2, and 0.5 minutes \citedsp{LPM-17}.}.}
 
-The term "make available" refers to the point at which an LSST alert packet becomes available for broker retrieval (i.e., it does not include the time it takes for a broker to receive or ingest the alert). It is furthermore specified that all delayed alerts be made available at the next opportunity (\citeds{LPM-17}; see also the discussion regarding delayed/failed alert distribution in \S~\ref{ssec:OTR1}).
+This requirement applies to visits resulting in fewer than 40,000 alerts, and the term "distribution" includes all steps up to and including the transmission of the alert packet out of the \gls{LSST} Data Facility (i.e., it does not include the time it takes for a broker to receive or ingest the alert). It is furthermore specified that all delayed alerts be made available at the next opportunity (\citeds{LPM-17}; see also the discussion regarding delayed/failed alert distribution in \S~\ref{ssec:OTR1}).
 
 
 % % % % % % % % % % % % %
-\subsection{Number of Alerts per Visit (and per Night)}\label{ssec:transN}
+\subsection{Number of Alerts per \gls{Visit} (and per Night)}\label{ssec:transN}
 
-{\bf It is a formal requirement that the DMS support the generation of \reqparam{transN}\lsrreq{0101}\reqparam{nAlertVisitAvg}\ossreq{0193} at least 10,000 alerts per visit\footnote{The design, minimum, and stretch values for the number of alerts per visit are $10^4$, $10^3$, and $10^5$ \citedsp{LPM-17}.} on average, and an instantaneous maximum of 40,000 alerts per visit.}
+{\bf It is a requirement that the \gls{DMS} support the distribution\reqparam{transN}\lsrreq{0101}\reqparam{nAlertVisitAvg}\ossreq{0193}\reqparam{nAlertVisitPeak}\dmreq{0393} of at least 10,000 alerts per standard visit\footnote{The design, minimum, and stretch values for the number of alerts per visit are $10^4$, $10^3$, and $10^5$ \citedsp{LPM-17}.} on average during a given night, and at least 40,000 alerts per single standard visit.}
 
-An approximate upper limit on the number of standard visits (the equivalent of 30 seconds of exposure time, plus $\sim$4 seconds of overhead) per night is 1,000 visits, which corresponds to $\lesssim$9.5 hours of observing time. Pending updates to LSST documentation (\citeds{LSE-30} and \citeds{LSE-61}) will clarify that the DMS must support a long-term average number of alerts {\it per night} of $10^7$ (i.e., 10,000 alerts per visit for 1,000 standard visits per night) and instantaneous peaks of 40,000 alerts {\it per visit}. At the time of writing, the latter was only defined in the DM sizing model \citedsp{LSE-81}.
+An extension of the above is that the \gls{DMS} will support a long-term average number of $10^7$ alerts distributed per night (assuming an average of 1,000 visits per night). It is furthermore specified that the performance of alert distribution shall degrade gracefully beyond these values, meaning that visits resulting in an excess of alerts should not cause any \gls{DMS} downtime.
 
-The value of 10,000 alerts per visit is a formal requirement on the DMS and not a scientific estimate of the intrinsic rate of transients and variables in the universe. However, estimates for the most common transients and variables can be derived from the Science Book \citep{2009arXiv0912.0201L} by making some significant assumptions, as follows:
+The value of 10,000 alerts per visit is a requirement on the \gls{DMS} and not a scientific estimate of the intrinsic rate of transients and variables in the universe. However, estimates for the most common transients and variables can be derived from the Science Book \citep{2009arXiv0912.0201L} by making some significant assumptions, as follows:
 \begin{itemize}
-\item Variable Stars: LSST is predicted to observe a total of $\sim$135 million variable stars. Making the simple assumption that 20\% (80\%) of the stars are in extragalactic (Galactic) fields, and that of the $\sim$18,000 deg$^2$ surveyed by LSST, 80\% (20\%) of the fields are extragalactic (Galactic), and that 10\% of all variable stars are detectably variable at any given time, then a typical extragalactic (Galactic) field would yield $\sim$1,800 ($\sim$28,800) alerts per visit \footnote{Since ``detectably variable" means ``significantly different from the template", the value of 10\% does depend on how the template is generated.}. Averaged over all fields, and weighted by 80\% and 20\% of the fields being extragalactic and Galactic, respectively, this is an average of 7,200 alerts per visit.
-\item Supernovae: LSST is predicted to observe a total of $\sim$10 million supernovae in 10 years, or $\sim$1 million per year. Since SNe are typically only visible for a few months, there might be $\sim$0.3 million detectable at any given time. Over 15,000 deg$^{2}$ of extragalactic survey area, that's $\sim$20 SNe deg$^{-2}$ or $\sim$200 alerts for SNe per visit.
-\item Active Galactic Nuclei: LSST is predicted to observe millions of AGN. If $\sim$10\% of them are detectably variable at any given time, then the estimate is that $\sim$0.1 million alerts over 15,000 deg$^2$ would generate $\sim$7 alerts deg$^{-2}$, or $\sim$70 alerts per visit for AGN.
-\item Moving Objects: The number of Solar System objects that LSST is predicted to observe is dominated by the 5.5 million main-belt asteroids. Assuming that they are spread evenly over the $\sim$18,000 deg$^2$ survey area (even though they're not, as they're found primarily along the ecliptic) leads to $\sim$3,000 alerts per visit due to moving objects.
+\item Variable Stars: \gls{LSST} is predicted to observe a total of $\sim$135 million variable stars. Making the simple assumption that 20\% (80\%) of the stars are in extragalactic (Galactic) fields, and that of the $\sim$18,000 \gls{deg}$^2$ surveyed by \gls{LSST}, 80\% (20\%) of the fields are extragalactic (Galactic), and that 10\% of all variable stars are detectably variable at any given time, then a typical extragalactic (Galactic) field would yield $\sim$1,800 ($\sim$28,800) alerts per visit \footnote{Since ``detectably variable" means ``significantly different from the template", the value of 10\% does depend on how the template is generated.}. Averaged over all fields, and weighted by 80\% and 20\% of the fields being extragalactic and Galactic, respectively, this is an average of 7,200 alerts per visit.
+\item Supernovae: \gls{LSST} is predicted to observe a total of $\sim$10 million supernovae in 10 years, or $\sim$1 million per year. Since SNe are typically only visible for a few months, there might be $\sim$0.3 million detectable at any given time. Over 15,000 \gls{deg}$^{2}$ of extragalactic survey area, that's $\sim$20 SNe \gls{deg}$^{-2}$ or $\sim$200 alerts for SNe per visit.
+\item Active Galactic Nuclei: \gls{LSST} is predicted to observe millions of AGN. If $\sim$10\% of them are detectably variable at any given time, then the estimate is that $\sim$0.1 million alerts over 15,000 \gls{deg}$^2$ would generate $\sim$7 alerts \gls{deg}$^{-2}$, or $\sim$70 alerts per visit for AGN.
+\item Moving Objects: The number of Solar System objects that \gls{LSST} is predicted to observe is dominated by the 5.5 million main-belt asteroids. Assuming that they are spread evenly over the $\sim$18,000 \gls{deg}$^2$ survey area (even though they're not, as they're found primarily along the ecliptic) leads to $\sim$3,000 alerts per visit due to moving objects.
 \end{itemize} 
 Therefore, astrophysical estimates for the occurrence rates of alerts caused by the most common types of transients and variables yield $\sim$5,100 ($\sim$32,000) alerts per visit in extragalactic (Galactic) fields, with an average of $\sim$10,500 alerts per visit.
 
@@ -112,91 +115,96 @@ Therefore, astrophysical estimates for the occurrence rates of alerts caused by 
 
 {\bf The size of an individual alert packet is estimated to be $\lesssim$82~KB.}
 
-There are no formal requirements regarding the alert packet size. The statement above is an estimate based on the planned content of the alerts as described in Section 3.5 of \citeds{LSE-163}. Simulated alert packets based on the Apache Avro format are at most $\sim$82~KB. This volume represents an alert packet for a variable star with a full 12 month history of detections. The application of gzip compression can further reduce the size of an alert to $\sim$65~KB (JIRA ticket DM-16280). Cutout stamps included in the alert will be at least 30$\times$30 pixels and contain flux (32 bit/pix), variance (32 bit/pix), and mask (16 bit/pix) extensions for both the template and difference image, plus a header of metadata \citedsp{LSE-163}. The stamps alone will contribute $\gtrsim$18~KB to the total size of the uncompressed alert packet (i.e., $\sim$20\%).
+There are no requirements regarding the alert packet size. The statement above is an estimate based on the planned content of the alerts as described in Section 3.5 of \citeds{LSE-163}. Simulated alert packets based on the Apache Avro format are at most $\sim$82~KB. This volume represents an alert packet for a variable star with a full 12 month history of detections, and the history alone accounts for $\sim$27KB of the alert packet ($\sim$33\%). Cutout stamps included in the alert will be at least 30$\times$30 pixels and contain \gls{flux} (32 bit/pix), variance (32 bit/pix), and mask (16 bit/pix) extensions for both the template and difference image, plus a header of \gls{metadata} \citedsp{LSE-163}. The stamps alone will contribute $\gtrsim$18~KB to the total size of the uncompressed alert packet (i.e., $\sim$20\%). The application of gzip compression can further reduce the size of an alert to $\sim$65~KB (\gls{JIRA} ticket \gls{DM}-16280). 
 
-{\bf "Lite" Packet Options --} Brokers that plan to do their own source association, compile source catalogs based on alerts, or not use the image stamps might prefer a stream of packets with appropriately reduced information. 
-The LSST DM team is currently open to exploring options for supporting "lite" versions of alert packets; individual brokers may indicate which information they require (or would like removed from the packets in their stream) during the broker proposal process \citedsp{LDM-682}.
-As previously mentioned, removing the image stamps would reduce packet size by $\gtrsim$18~KB. Removing the historical records of past detections would also reduce the size of all alert packets. 
-A few of these options might also be available to users of the LSST alert filtering service (\S~\ref{sec:LAFS}).
+{\bf ``Lite" Packet Options --} Brokers that plan to do their own source association, compile source catalogs based on alerts, or not use the image stamps might prefer a stream of packets with appropriately reduced information. 
+The \gls{LSST} \gls{DM} team is currently open to exploring options for supporting ``Lite" versions of alert packets. Individual broker teams may indicate which information they require (or would like removed from the packets in their stream) during the broker proposal process \citedsp{LDM-723}.
+As previously mentioned, removing the image stamps would reduce packet size by $\gtrsim$18~KB, and removing the historical records of past detections could reduce packet size by up to $\sim$27~KB. 
+A few of these options might also be available to users of the \gls{LSST} alert filtering service (\S~\ref{sec:LAFS}).
 
 % % % % % % % % % % % % %
 \subsection{Alert Stream Data Rate}\label{ssec:data_rate}
 
-{\bf The time-averaged data rate of the alert stream is estimated to be $\sim$25~MB~s$^{-1}$, potentially with bursts of up to 640~MB~s$^{-1}$.}
+{\bf The time-averaged data rate of the alert stream is estimated to be $\sim$0.2~Gbps, potentially with bursts of up to 5.4~Gbps.}
 
-There are no formal requirements regarding the alert stream data rate. The values quoted in the statement above are estimates based on the expected size of an alert packet ($\sim$82~KB, Section \ref{ssec:packet_size}), the number of alerts per visit, and the alert distribution mechanism. Using an average of 10,000 alerts released per standard visit, this leads to a {\it time-averaged} alert stream data rate of  $\sim$25~MB~s$^{-1}$. As discussed in \S~\ref{ssec:transN}, the number of alerts per field will vary in extragalactic and Galactic fields from $\sim$2,000 to $\lesssim$40,000, which would produce {\it time-averaged} alert streams of $\sim$5 to $\lesssim$100~MB~s$^{-1}$. However, in order to release alerts within 60 seconds of image readout (\S~\ref{ssec:OTT1}), the stream will not be continuous in time, but periodic, with potential bursts: if all 10,000 alerts are issued within the last 5 seconds of that window the data rate would be 160~MB~s$^{-1}$. In galactic fields with $\sim$40,000 alerts per visit this could be as high as 640~MB~s$^{-1}$.
+There are no requirements regarding the alert stream data rate. The values quoted in the statement above are estimates based on the expected size of an alert packet ($\sim$82~KB, Section \ref{ssec:packet_size}), the number of alerts per visit, and the alert distribution mechanism. Using an average of 10,000 alerts released per standard visit, this leads to a {\it time-averaged} alert stream data rate of  $\sim$0.2~Gbps. As discussed in \S~\ref{ssec:transN}, the number of alerts per field will vary in extragalactic and Galactic fields from $\sim$2,000 to $\lesssim$40,000, which would produce {\it time-averaged} alert streams of $\sim$0.04 to $\lesssim$0.8~Gbps. However, in order to release alerts within 60 seconds of image readout (\S~\ref{ssec:OTT1}), the stream will not be continuous in time, but periodic, with potential bursts: if all 10,000 alerts are issued within the last 5 seconds of that window the data rate would be 1.3~Gbps. In galactic fields with $\sim$40,000 alerts per visit this could be as high as 5.4~Gbps.
 
 
 % % % % % % % % % % % % %
 \subsection{Number of Selected Brokers}\label{ssec:num_brokers}
 
-{\bf The DM team estimates that resources will allow for the delivery of the alert stream to 4 to 7 community brokers.}
+{\bf It is a requirement\reqparam{numStreams}\dmreq{0391} that the \gls{DMS} be capable of supporting the transmission of at least 5 full alert streams within 60 seconds of image readout.}
 
-There are no formal requirements on the number of brokers. The statement above is an estimate based on the alert stream data rate and the bandwidth allocated to alert distribution. As described in Section 2.2.3 of \citeds{LDM-612}: {\it "An allocation of 10~Gbps is baselined for alert stream transfer from the [LSST Data Facility], with an estimated packet size of 82~KB and up to 10,000 alerts per visit. For illustration, based on these numbers up to 7 brokers could receive the full stream if 5 seconds is budgeted for outbound data transfer."} 
-
+This requirement is based in part on what estimates of the alert stream data rate and the bandwidth allocated to alert distribution have shown will be possible to support. 
 
 % % % % % % % % % % % % %
 \subsection{Alert Database Volume}\label{ssec:adb_volume}
 
 {\bf The estimated size of the alerts database after 10 years is $\sim$2.2~PB.}
 
-There are no formal requirements on the alerts database volume. The statement above is an estimate based on the alert packet contents, the number of alerts per night, and the expected number of observing nights per year. As described in \S~\ref{ssec:transN}, the DMS system will support an average of $\sim$10 million alerts per night (which approximately matches the expected scientific yields). Assuming the upper estimate of $\sim$82~KB per alert (\S~\ref{ssec:packet_size}), that leads to a total of $\sim$782~GB per night. After accounting for downtime and weather\ossreq{0080}\ossreq{0081}\ossreq{0082} the total number of observing nights is 300 per year \citedsp{LSE-30}, which leads to an estimate of $\sim$2.2~PB after 10 years. Compression could drastically lower this, as could reformatting: every alert contains a $\sim$12 month historical record and links to the most recent DIAObject and DR Object catalogs. The set of alerts for the same transient/variable would contain a significant amount of redundant information, which is provided to enable rapid filtering but could be reformatted for long-term storage (i.e., removed from the individual alerts and compiled elsewhere in an alerts database). 
+There are no requirements on the alerts database volume. The statement above is an estimate based on the alert packet contents, the number of alerts per night, and the expected number of observing nights per year. As described in \S~\ref{ssec:transN}, the \gls{DMS} system will support an average of $\sim$10 million alerts per night (which approximately matches the expected scientific yields). Assuming the upper estimate of $\sim$82~KB per alert (\S~\ref{ssec:packet_size}), that leads to a total of $\sim$782~GB per night. After accounting for downtime and weather\ossreq{0080}\ossreq{0081}\ossreq{0082} the total number of observing nights is 300 per year \citedsp{LSE-30}, which leads to an estimate of $\sim$2.2~PB after 10 years.
 
 
 % % % % % % % % % % % % %
-\subsection{Delayed/Failed Alert Distribution}\label{ssec:OTR1}
+\subsection{Delayed/Failed \gls{Alert} Distribution}\label{ssec:OTR1}
 
-{\bf It is a formal requirement that no more than 1\% (0.1\%)\reqparam{sciVisitAlertDelay}\reqparam{sciVisitAlertFailure}\ossreq{0112} of all science visits experience delayed (failed) alert generation and distribution.}
+{\bf It is a requirement\reqparam{sciVisitAlertDelay}\reqparam{sciVisitAlertFailure}\ossreq{0112}\dmreq{0392} that no more than 1\% of all standard visits fail to have at least 98\% of its alerts distributed within 60 seconds of image readout, and that no more than 0.1\% of all standard visits fail to distribute alerts.}
 
-Given the requirement in \S~\ref{ssec:OTT1} that 98\% of all alerts be made available within 60 seconds, a visit would be considered "delayed" and count towards that 1\% limit if, and only if, $>$2\% of its alerts were made available with a latency of $>$60 seconds. The requirement that no more than 0.1\% of all science visits fail to generate and/or distribute alerts is integrated over all stages of data handling (i.e., includes failures at any stage of prompt processing).
+These requirements apply to standard visits which should have produced $\leq$40,000 alerts. For example, a visit would be considered "delayed" and count towards that 1\% limit if $>$2\% of its alerts were distributed with a latency of $>$60 seconds. The requirement that no more than 0.1\% of all science visits fail to generate and/or distribute alerts is integrated over all stages of data handling, not just alert distribution, and includes failures at any stage of prompt processing.
 
-Assuming $\sim$10 million alerts per night (\S~\ref{ssec:transN}), brokers can rely on the DMS to not exceed an upper limit of 200,000 alerts (2\%) being made available with a latency of $>$60 seconds, and an upper limit of 10,000 alerts (or 1 visit's worth, i.e., 0.1\% of 1,000 visits per night) that fail to be generated and/or made available. In other words, the absolute worst-case scenario for a night --- even though we might not expect it to happen --- : still meets these specifications is if 989 visits all have just under 2\% of their alerts (i.e., up to 197800 alerts) delayed by $>$60 seconds and made available within 24 hours, {\it and} 10 visits (1\%) have all of their alerts made available with $>$60 seconds and $<$24 hours (i.e., are ``delayed" but not ``failed"), {\it and} 1 visit (0.1\%) completely fails to generate and/or make available any alerts.
+For an average of 10,000 alerts per visit and 1,000 visits per night, this requirement allows the \gls{DMS} to distribute up to 2\% (200,000 alerts per night) with a latency $>$60 seconds after image readout.
+The worst-case scenario for a night of alert distribution which still meets these requirements is if 989 visits all have just under 2\% of their alerts delayed by $>$60 seconds and distributed within 24 hours (197,800 alerts delayed), {\it and} 10 visits (1\%) have all of their alerts distributed with $>$60 seconds and $<$24 hours (100,000 alerts delayed), {\it and} 1 visit (0.1\%) completely fails to generate and/or distribute any alerts (10,000 alerts ).
 
 
 % % % % % % % % % % % % %
 \subsection{Alert Stream Completeness and Purity}\label{ssec:comp_pure}
 
-{\bf It is a formal requirement that DM derive and supply threshold values\reqparam{transSampleSNR}\reqparam{transCompletenessMin}\reqparam{transPurityMin}\ossreq{0353} for a spuriousness\footnote{In this context, spuriousness is like a real/bogus score.} parameter, which can be used to filter alerts into a subsample of transient and variable objects with a given completeness and purity.}
+{\bf It is a requirement that \gls{DM} derive and supply threshold values\reqparam{transSampleSNR}\reqparam{transCompletenessMin}\reqparam{transPurityMin}\ossreq{0353} for a spuriousness\footnote{In this context, spuriousness is like a real/bogus score.} parameter, which can be used to filter alerts into a subsample of \gls{transient} and variable objects with a given completeness and purity.}
 
-The formal requirement is that DM calculate a spuriousness parameter for all alerts, and derive and supply a spuriousness threshold value that filters the full stream into a subsample of alerts for transient and variable objects\footnote{See also OSS-REQ-0354 for the required parameters for a subsample of transient and variable objects \citedsp{LSE-30}.} that is 90\% complete and 95\% pure for all sources with a signal-to-noise ratio $>$6. While the requirements on purity and completeness are specified as point thresholds, DM expects to provide information to enable users to choose spuriousness threshold values that can be used to filter the stream to a desired level of completeness and purity, thereby reducing the fraction of false positives (sources detected that are not astrophysical in origin) to a level that is appropriate for their science goals. Brokers could request a pre-filtered stream that includes a restriction on spuriousness.
+The requirement is that \gls{DM} calculate a spuriousness parameter for all alerts, and derive and supply a spuriousness threshold value that filters the full stream into a subsample of alerts for \gls{transient} and variable objects\footnote{See also \gls{OSS}-REQ-0354 for the required parameters for a subsample of \gls{transient} and variable objects \citedsp{LSE-30}.} that is 90\% complete and 95\% pure for all sources with a signal-to-noise ratio $>$6. While the requirements on purity and completeness are specified as point thresholds, \gls{DM} expects to provide information to enable users to choose spuriousness threshold values that can be used to filter the stream to a desired level of completeness and purity, thereby reducing the fraction of false positives (sources detected that are not astrophysical in origin) to a level that is appropriate for their science goals. Brokers could request a pre-filtered stream that includes a restriction on spuriousness.
 
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-\section{The LSST Alert Filtering Service} \label{sec:LAFS}
+\section{The \gls{LSST} Alert Filtering Service} \label{sec:LAFS}
 
-{\bf It is a formal requirement that the LSST provide an alerts filtering service for users.}\dmreq{0342}\dmreq{0348} 
+{\bf It is a requirement that the \gls{LSST} provide an alerts filtering service for users.}\dmreq{0342}\dmreq{0348} 
 
-The LSST alerts filtering service is a mechanism by which users --- individuals with LSST data rights and access --- can receive alerts via pre-defined filters that have been optimized for established transient classifications such as supernovae and/or create and apply their own filters to the stream \citedsp{LPM-17,LSE-61}. 
+The \gls{LSST} alerts filtering service is a mechanism by which users --- individuals with \gls{LSST} data rights and access --- can receive alerts via pre-defined filters that have been optimized for established \gls{transient} classifications such as supernovae and/or create and apply their own filters to the stream \citedsp{LPM-17,LSE-61}. 
 
 
 % % % % % % % % % % % % %
 \subsection{Number of Simultaneous Users}\label{ssec:LAFS_users}
 
-{\bf It is a formal requirement that the LSST alert filtering service be able to support\reqparam{numBrokerUsers}\dmreq{0343} at least 100 simultaneous users.}
+{\bf It is a requirement that the \gls{LSST} alert filtering service be able to support\reqparam{numBrokerUsers}\dmreq{0343} at least 100 simultaneous users.}
 
-This requirement is driven by outbound bandwidth limitations from the Data Access Center at the National Center for Supercomputing Applications (NCSA); the DM team is currently investigating approaches that would support larger numbers of active users \citedsp{LDM-612}. During LSST Operations, if the total number of simultaneous users is oversubscribed then a proposal process may be instituted \citedsp{LSE-163}.
+This requirement is driven by outbound bandwidth limitations from the Data Access \gls{Center} at the National \gls{Center} for Supercomputing Applications (\gls{NCSA}); the \gls{DM} team is currently investigating approaches that would support larger numbers of active users \citedsp{LDM-612}. During \gls{LSST} \gls{Operations}, if the total number of simultaneous users is oversubscribed then a proposal process may be instituted \citedsp{LSE-163}.
 
 
 % % % % % % % % % % % % %
-\subsection{Number of Alerts per Visit Returned}\label{ssec:LAFS_returns}
+\subsection{Number of Alerts per \gls{Visit} Returned}\label{ssec:LAFS_returns}
 
-{\bf It is a formal requirement that the LSST alert filtering service be able to return 20\reqparam{numBrokerAlerts}\dmreq{0343} full-sized alerts per visit per user.}
+{\bf It is a requirement that the \gls{LSST} alert filtering service be able to return 20\reqparam{numBrokerAlerts}\dmreq{0343} full-sized alerts per visit per user.}
 
 Assuming 1,000 visits per night (\S~\ref{ssec:transN}), each user's filter will be capable of returning 20,000 alerts per night, which would amount to $\sim$1.6~GB (\S~\ref{ssec:packet_size}).
 
 
 % % % % % % % % % % % % %
-\section{Alerts Archive}\label{ssec:LAFS_adb}
+\section{Alerts \gls{Archive}}\label{ssec:LAFS_adb}
 
-{\bf It is a formal requirement that all alerts be stored in an archival database and be available for retrieval.}\ossreq{0185}
+{\bf It is a requirement that all alerts be stored in an archival database and be available for retrieval.}\ossreq{0185}
 
-The term "available for retrieval" applies to users with data rights and access to the LSST Science Platform. Like all other Prompt data products, the alerts archive will be updated within 24\reqparam{L1PublicT}\lsrreq{0104} hours \citedsp{LSE-29}. The alerts archive is not a part of the LSST alert filtering service, but is included in this section to raise awareness of its existence. 
+The term "available for retrieval" applies to users with data rights and access to the \gls{LSST} \gls{Science Platform}. Like all other Prompt data products, the alerts archive will be updated within 24\reqparam{L1PublicT}\lsrreq{0104} hours \citedsp{LSE-29}. The alerts archive is not a part of the \gls{LSST} alert filtering service, but is included in this section to raise awareness of its existence. 
 
-The LSST DM team anticipates that the alerts archive will support queries by their unique alert identification numbers, but might not support searches by coordinate, time, magnitude, or other alert attributes. For this reason, the alerts archive should {\em not} be considered a viable alternative for users who {\em do} wish to study transient, variable and moving objects with the LSST, but who {\em do not} require immediate (i.e., same-night) access to sources detected via difference image analysis. In other words, queries to the alerts archival database should not be construed as a viable alternative to community brokers or the LSST alert filtering service. Instead, users with science goals that are achievable with a latency of $\geq$24 hours should plan to use the Prompt data products described in Section 3 of \citeds{LSE-163}. Furthermore, users with science goals that are achievable with latencies of a year or more (i.e., archival time-domain studies) should plan to use the Data Release data products described in Section 4 of \citeds{LSE-163}.
+The \gls{LSST} \gls{DM} team anticipates that the alerts archive will support queries by their unique alert identification numbers, but might not support searches by coordinate, time, magnitude, or other alert attributes. For this reason, the alerts archive should {\em not} be considered a viable alternative for users who {\em do} wish to study \gls{transient}, variable and moving objects with the \gls{LSST}, but who {\em do not} require immediate (i.e., same-night) access to sources detected via difference image analysis. In other words, queries to the alerts archival database should not be construed as a viable alternative to community brokers or the \gls{LSST} alert filtering service. Instead, users with science goals that are achievable with a latency of $\geq$24 hours should plan to use the Prompt data products described in Section 3 of \citeds{LSE-163}. Furthermore, users with science goals that are achievable with latencies of a year or more (i.e., archival time-domain studies) should plan to use the Data \gls{Release} data products described in Section 4 of \citeds{LSE-163}.
 
 
+\appendix
 % Include all the relevant bib files.
 % https://lsst-texmf.lsst.io/lsstdoc.html#bibliographies
+\label{sec:bib}
 \bibliography{local,lsst,lsst-dm,refs_ads,refs,books}
+
+\label{sec:acronyms}
+\printglossaries
 
 \end{document}

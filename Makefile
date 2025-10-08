@@ -2,7 +2,7 @@ DOCTYPE = DMTN
 DOCNUMBER = 102
 DOCNAME = $(DOCTYPE)-$(DOCNUMBER)
 
-tex = $(filter-out $(wildcard *acronyms.tex) , $(wildcard *.tex))
+tex = $(filter-out $(wildcard *aglossary.tex) , $(wildcard *.tex))
 
 GITVERSION := $(shell git log -1 --date=short --pretty=%h)
 GITDATE := $(shell git log -1 --date=short --pretty=%ad)
@@ -29,7 +29,7 @@ acronyms.tex: $(tex) myacronyms.txt
 
 # If you want a glossary you must manually run generateAcronyms.py  -gu to put the \gls in your files.
 aglossary.tex :$(tex) myacronyms.txt
-	generateAcronyms.py  -g $(tex)
+	python3 $(TEXMFHOME)/../bin/generateAcronyms.py  -g $(tex)
 
 
 .PHONY: clean
